@@ -1,6 +1,7 @@
-import { Command, ValidationError } from '@cliffy/command';
+import { Command } from '@cliffy/command';
 import {
   type GameMatch,
+  requireOsHandler,
   resolveGameAndRun,
   SteamGameCommandHandlerType,
 } from '../common.ts';
@@ -52,16 +53,8 @@ export const gameTweaks = new Command()
     // TODO: Implement verbose output
     const gameName = name.join(' ');
 
-    const handlers: Record<string, (undefined | SteamGameCommandHandlerType)> =
-      {
-        // NOTE: having a prefix for windows doesn't make sense
-        linux: linuxGameTweaksHandler,
-      };
-
-    const handler = handlers[Deno.build.os];
-    if (!handler) {
-      throw new ValidationError(`Unsupported OS: ${Deno.build.os}`);
-    }
-
+    const handler = requireOsHandler({
+      linux: linuxGameTweaksHandler,
+    });
     await handler({ appId, name: gameName });
   });

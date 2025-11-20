@@ -1,5 +1,6 @@
 import { Table } from '@cliffy/table';
 import { join } from '@std/path';
+import { ValidationError } from '@cliffy/command';
 import { parseSteamCacheFile } from '../utils/parse-steam-caches.ts';
 
 const _homedir = Deno.env.get('HOME');
@@ -113,4 +114,15 @@ export async function resolveGameAndRun(
     return;
   }
   return run(matches[0]);
+}
+
+export function requireOsHandler<T>(
+  handlers: Record<string, T | undefined>,
+  os = Deno.build.os,
+): T {
+  const handler = handlers[os];
+  if (!handler) {
+    throw new ValidationError(`Unsupported OS: ${os}`);
+  }
+  return handler;
 }
