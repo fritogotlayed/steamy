@@ -9,6 +9,7 @@
     "jsr:@cliffy/prompt@1.0.0-rc.7": "1.0.0-rc.7",
     "jsr:@cliffy/table@1.0.0-rc.7": "1.0.0-rc.7",
     "jsr:@std/assert@*": "1.0.7",
+    "jsr:@std/assert@1": "1.0.7",
     "jsr:@std/assert@~1.0.6": "1.0.7",
     "jsr:@std/encoding@~1.0.5": "1.0.10",
     "jsr:@std/fmt@~1.0.2": "1.0.8",

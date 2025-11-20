@@ -1,5 +1,6 @@
+import { Table } from '@cliffy/table';
 import { join } from '@std/path';
-import { parseAcf } from '../utils/parse-acf.ts';
+import { parseSteamCacheFile } from '../utils/parse-steam-caches.ts';
 
 const _homedir = Deno.env.get('HOME');
 
@@ -48,16 +49,14 @@ export async function findAppIdMatches(gameName: string): Promise<GameMatch[]> {
 
   const gameNameUpper = gameName.toLocaleUpperCase();
   const matches: GameMatch[] = [];
-  const textDecoder = new TextDecoder('utf-8');
 
   try {
     for await (const entry of Deno.readDir(gameDir)) {
       if (entry.name.endsWith('.acf')) {
         const filePath = join(gameDir, entry.name);
-        const fileBody = await Deno.readFile(filePath);
 
-        const meta = parseAcf(
-          textDecoder.decode(fileBody),
+        const meta = await parseSteamCacheFile(
+          filePath,
         ) as unknown as AcfFileFragment;
         const nameUpper = meta.AppState.name.toLocaleUpperCase();
         if (nameUpper.indexOf(gameNameUpper) > -1) {
@@ -75,4 +74,43 @@ export async function findAppIdMatches(gameName: string): Promise<GameMatch[]> {
     throw new Error(`Failed to access Steam directory: ${errorMessage}`);
   }
   return matches;
+}
+
+/**
+ * Prints a table of matches to the console
+ * @param matches - Array of matches to print
+ */
+export function printMatchesTable(matches: GameMatch[]) {
+  new Table()
+    .body(matches.map((m) => [m.appId, m.name]))
+    .header(['AppId', 'Name'])
+    .border(true)
+    .render();
+}
+
+/**
+ * Resolves a game based on the provided arguments and runs the provided function
+ * @param args - SteamGameCliArgument object containing appId or name
+ * @param run - Function to run with the resolved game
+ */
+export async function resolveGameAndRun(
+  args: SteamGameCliArgument,
+  run: (game: GameMatch) => void | Promise<void>,
+) {
+  const { appId, name } = args;
+  if (appId) {
+    return run({ appId, name });
+  }
+
+  const matches = await findAppIdMatches(name);
+  if (matches.length === 0) {
+    console.log(`No matches found for ${name}. Are you sure it is installed?`);
+    return;
+  }
+  if (matches.length > 1) {
+    console.log(`Multiple matches found for ${name}.`);
+    printMatchesTable(matches);
+    return;
+  }
+  return run(matches[0]);
 }

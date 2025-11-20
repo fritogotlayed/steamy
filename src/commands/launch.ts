@@ -1,10 +1,9 @@
 import { Command, ValidationError } from '@cliffy/command';
 import {
-  findAppIdMatches,
   type GameMatch,
+  resolveGameAndRun,
   type SteamGameCommandHandlerType,
 } from './common.ts';
-import { Table } from '@cliffy/table';
 
 function linuxLaunch(game: GameMatch) {
   const cmd = new Deno.Command('steam', {
@@ -13,29 +12,8 @@ function linuxLaunch(game: GameMatch) {
   cmd.spawn();
 }
 
-const linuxLaunchHandler: SteamGameCommandHandlerType = async (
-  { appId, name },
-) => {
-  if (appId) {
-    linuxLaunch({ appId, name });
-    return;
-  }
-
-  const matches = await findAppIdMatches(name);
-
-  if (matches.length === 0) {
-    console.log(`No matches found for ${name}. Are you sure it is installed?`);
-  } else if (matches.length > 1) {
-    console.log(`Multiple matches found for ${name}.`);
-    new Table()
-      .body(matches.map((match) => [match.appId, match.name]))
-      .header(['AppId', 'Name'])
-      .border(true)
-      .render();
-  } else {
-    linuxLaunch(matches[0]);
-  }
-};
+const linuxLaunchHandler: SteamGameCommandHandlerType = (args) =>
+  resolveGameAndRun(args, linuxLaunch);
 
 export const launch = new Command()
   .name('launch')

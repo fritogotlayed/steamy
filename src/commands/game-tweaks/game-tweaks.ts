@@ -1,8 +1,7 @@
-import { Table } from '@cliffy/table';
 import { Command, ValidationError } from '@cliffy/command';
 import {
-  findAppIdMatches,
   type GameMatch,
+  resolveGameAndRun,
   SteamGameCommandHandlerType,
 } from '../common.ts';
 import { readDeadRedemption2 } from './games/read-dead-redemption-2.ts';
@@ -37,29 +36,8 @@ async function linuxGameTweaks(game: GameMatch) {
   }
 }
 
-const linuxGameTweaksHandler: SteamGameCommandHandlerType = async (
-  { appId, name },
-) => {
-  if (appId) {
-    await linuxGameTweaks({ appId, name });
-    return;
-  }
-
-  const matches = await findAppIdMatches(name);
-
-  if (matches.length === 0) {
-    console.log(`No matches found for ${name}. Are you sure it is installed?`);
-  } else if (matches.length > 1) {
-    console.log(`Multiple matches found for ${name}.`);
-    new Table()
-      .body(matches.map((match) => [match.appId, match.name]))
-      .header(['AppId', 'Name'])
-      .border(true)
-      .render();
-  } else {
-    await linuxGameTweaks(matches[0]);
-  }
-};
+const linuxGameTweaksHandler: SteamGameCommandHandlerType = (args) =>
+  resolveGameAndRun(args, linuxGameTweaks);
 
 export const gameTweaks = new Command()
   .name('gameTweaks')

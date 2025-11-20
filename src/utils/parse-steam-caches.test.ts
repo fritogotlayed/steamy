@@ -1,17 +1,17 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { parseAcf } from './parse-acf.ts';
+import { parseSteamCacheBody } from './parse-steam-caches.ts';
 
-Deno.test('parseAcf - basic key-value parsing', () => {
+Deno.test('parseSteamCaches - basic key-value parsing', () => {
   const input = `"key1"\n{\n\t"value1"\t"data1"\n}`;
   const expected = {
     key1: {
       value1: 'data1',
     },
   };
-  assertEquals(parseAcf(input), expected);
+  assertEquals(parseSteamCacheBody(input), expected);
 });
 
-Deno.test('parseAcf - nested structure parsing', () => {
+Deno.test('parseSteamCaches - nested structure parsing', () => {
   const input =
     `root\n{\n\tkey1\n\t{\n\t\tvalue1\tdata1\n\t}\n\tkey2\tdata2\n}`;
   const expected = {
@@ -22,20 +22,20 @@ Deno.test('parseAcf - nested structure parsing', () => {
       key2: 'data2',
     },
   };
-  assertEquals(parseAcf(input), expected);
+  assertEquals(parseSteamCacheBody(input), expected);
 });
 
-Deno.test('parseAcf - handles quoted values', () => {
+Deno.test('parseSteamCaches - handles quoted values', () => {
   const input = `key1\n{\n\tvalue1\t"quoted data"\n}`;
   const expected = {
     key1: {
       value1: 'quoted data',
     },
   };
-  assertEquals(parseAcf(input), expected);
+  assertEquals(parseSteamCacheBody(input), expected);
 });
 
-Deno.test('parseAcf - handles multiple siblings', () => {
+Deno.test('parseSteamCaches - handles multiple siblings', () => {
   const input =
     `root\n{\n\tsibling1\n\t{\n\t\tkey1\tvalue1\n\t}\n\tsibling2\n\t{\n\t\tkey2\tvalue2\n\t}\n}`;
   const expected = {
@@ -48,23 +48,23 @@ Deno.test('parseAcf - handles multiple siblings', () => {
       },
     },
   };
-  assertEquals(parseAcf(input), expected);
+  assertEquals(parseSteamCacheBody(input), expected);
 });
 
-Deno.test('parseAcf - throws on invalid input', () => {
+Deno.test('parseSteamCaches - throws on invalid input', () => {
   assertThrows(
-    () => parseAcf(''),
+    () => parseSteamCacheBody(''),
     Error,
     'Invalid input: body must be a non-empty string',
   );
   assertThrows(
-    () => parseAcf(undefined as unknown as string),
+    () => parseSteamCacheBody(undefined as unknown as string),
     Error,
     'Invalid input: body must be a non-empty string',
   );
 });
 
-Deno.test('parseAcf - handles different line endings', () => {
+Deno.test('parseSteamCaches - handles different line endings', () => {
   const inputWindows = 'key1\r\n{\r\n\tvalue1\tdata1\r\n}';
   const inputUnix = 'key1\n{\n\tvalue1\tdata1\n}';
   const expected = {
@@ -72,6 +72,6 @@ Deno.test('parseAcf - handles different line endings', () => {
       value1: 'data1',
     },
   };
-  assertEquals(parseAcf(inputWindows), expected);
-  assertEquals(parseAcf(inputUnix), expected);
+  assertEquals(parseSteamCacheBody(inputWindows), expected);
+  assertEquals(parseSteamCacheBody(inputUnix), expected);
 });

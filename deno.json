@@ -9,6 +9,7 @@
     "debug": "deno run --inspect-wait --allow-read --allow-run --allow-env --allow-write ./src/main.ts",
     "dev": "deno run --allow-read --allow-run --allow-env --allow-write ./src/main.ts",
     "format": "deno fmt",
+    "qa": "deno test && deno fmt --check && deno lint",
     "test": "deno test",
     "test-with-coverage": "deno test --coverage && deno coverage --detailed",
     "types-check": "deno check ./src"

@@ -1,8 +1,7 @@
-import { Table } from '@cliffy/table';
 import { Command, ValidationError } from '@cliffy/command';
 import {
-  findAppIdMatches,
   type GameMatch,
+  resolveGameAndRun,
   type SteamGameCommandHandlerType,
 } from './common.ts';
 
@@ -24,29 +23,8 @@ function linuxOpenPrefix(game: GameMatch) {
   cmd.spawn();
 }
 
-const linuxOpenPrefixHandler: SteamGameCommandHandlerType = async (
-  { appId, name },
-) => {
-  if (appId) {
-    linuxOpenPrefix({ appId, name });
-    return;
-  }
-
-  const matches = await findAppIdMatches(name);
-
-  if (matches.length === 0) {
-    console.log(`No matches found for ${name}. Are you sure it is installed?`);
-  } else if (matches.length > 1) {
-    console.log(`Multiple matches found for ${name}.`);
-    new Table()
-      .body(matches.map((match) => [match.appId, match.name]))
-      .header(['AppId', 'Name'])
-      .border(true)
-      .render();
-  } else {
-    linuxOpenPrefix(matches[0]);
-  }
-};
+const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args) =>
+  resolveGameAndRun(args, linuxOpenPrefix);
 
 export const openPrefix = new Command()
   .name('openPrefix')
