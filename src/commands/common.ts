@@ -4,13 +4,22 @@ import { parseAcf } from '../utils/parse-acf.ts';
 const _homedir = Deno.env.get('HOME');
 
 export type GameMatch = {
-  appId: number;
+  appId: string;
   name: string;
 };
 
+export type SteamGameCliArgument = {
+  appId?: string;
+  name: string;
+};
+
+export type SteamGameCommandHandlerType = (
+  args: SteamGameCliArgument,
+) => Promise<void>;
+
 export type AcfFileFragment = {
   AppState: {
-    appid: number;
+    appid: string;
     name: string;
   };
 };

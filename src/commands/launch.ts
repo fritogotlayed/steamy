@@ -1,23 +1,23 @@
 import { Command, ValidationError } from '@cliffy/command';
-import { findAppIdMatches, GameMatch } from './common.ts';
+import {
+  findAppIdMatches,
+  type GameMatch,
+  type SteamGameCommandHandlerType,
+} from './common.ts';
 import { Table } from '@cliffy/table';
-
-type launchHandlerType = (
-  { appId, name }: { appId?: string; name: string },
-) => Promise<void>;
 
 function linuxLaunch(game: GameMatch) {
   const cmd = new Deno.Command('steam', {
-    args: ['-applaunch', game.appId.toString()],
+    args: ['-applaunch', game.appId],
   });
   cmd.spawn();
 }
 
-async function linuxLaunchHandler(
-  { appId, name }: { appId?: string; name: string },
-) {
+const linuxLaunchHandler: SteamGameCommandHandlerType = async (
+  { appId, name },
+) => {
   if (appId) {
-    linuxLaunch({ appId: parseInt(appId), name });
+    linuxLaunch({ appId, name });
     return;
   }
 
@@ -35,7 +35,7 @@ async function linuxLaunchHandler(
   } else {
     linuxLaunch(matches[0]);
   }
-}
+};
 
 export const launch = new Command()
   .name('launch')
@@ -47,10 +47,11 @@ export const launch = new Command()
     // TODO: Implement verbose output
     const gameName = name.join(' ');
 
-    const handlers: Record<string, (undefined | launchHandlerType)> = {
-      // NOTE: having a prefix for windows doesn't make sense
-      linux: linuxLaunchHandler,
-    };
+    const handlers: Record<string, (undefined | SteamGameCommandHandlerType)> =
+      {
+        // NOTE: having a prefix for windows doesn't make sense
+        linux: linuxLaunchHandler,
+      };
 
     const handler = handlers[Deno.build.os];
     if (!handler) {

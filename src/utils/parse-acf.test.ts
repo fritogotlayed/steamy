@@ -1,8 +1,8 @@
-import { assertEquals, assertThrows } from 'jsr:@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { parseAcf } from './parse-acf.ts';
 
 Deno.test('parseAcf - basic key-value parsing', () => {
-  const input = `key1\n{\n\tvalue1\tdata1\n}`;
+  const input = `"key1"\n{\n\t"value1"\t"data1"\n}`;
   const expected = {
     key1: {
       value1: 'data1',

@@ -3,32 +3,45 @@ import { Command, ValidationError } from '@cliffy/command';
 import {
   findAppIdMatches,
   type GameMatch,
-  type SteamGameCommandHandlerType,
-} from './common.ts';
+  SteamGameCommandHandlerType,
+} from '../common.ts';
+import { readDeadRedemption2 } from './games/read-dead-redemption-2.ts';
 
-const _homedir = Deno.env.get('HOME');
+// const _homedir = Deno.env.get('HOME');
 
-function linuxOpenPrefix(game: GameMatch) {
-  const prefixDir = [
-    _homedir,
-    '.steam',
-    'steam',
-    'steamapps',
-    'compatdata',
-    game.appId,
-  ].join('/');
+// TODO: Implement tweaks for the game
+const TweakHandlers: Record<string, (() => Promise<void> | void) | undefined> =
+  {
+    '1174180': () => readDeadRedemption2(),
+  };
 
-  console.log(`Opening prefix for ${game.name}...`);
+async function linuxGameTweaks(game: GameMatch) {
+  // const prefixDir = [
+  //   _homedir,
+  //   '.steam',
+  //   'steam',
+  //   'steamapps',
+  //   'compatdata',
+  //   game.appId,
+  // ].join('/');
 
-  const cmd = new Deno.Command('xdg-open', { args: [prefixDir] });
-  cmd.spawn();
+  const handler = TweakHandlers[game.appId];
+  if (handler) {
+    console.log(`Applying tweaks for ${game.name} (${game.appId})...`);
+    const result = handler();
+    if (result?.then) {
+      await result;
+    }
+  } else {
+    console.log(`No tweaks found for ${game.name} (${game.appId})`);
+  }
 }
 
-const linuxOpenPrefixHandler: SteamGameCommandHandlerType = async (
+const linuxGameTweaksHandler: SteamGameCommandHandlerType = async (
   { appId, name },
 ) => {
   if (appId) {
-    linuxOpenPrefix({ appId, name });
+    await linuxGameTweaks({ appId, name });
     return;
   }
 
@@ -44,13 +57,13 @@ const linuxOpenPrefixHandler: SteamGameCommandHandlerType = async (
       .border(true)
       .render();
   } else {
-    linuxOpenPrefix(matches[0]);
+    await linuxGameTweaks(matches[0]);
   }
 };
 
-export const openPrefix = new Command()
-  .name('openPrefix')
-  .description('Open the prefix folder')
+export const gameTweaks = new Command()
+  .name('gameTweaks')
+  .description('Tweaks for a specific games')
   .option(
     '-a, --appId <appId:string>',
     'The AppId to launch if filtering by name alone will not suffice.',
@@ -64,7 +77,7 @@ export const openPrefix = new Command()
     const handlers: Record<string, (undefined | SteamGameCommandHandlerType)> =
       {
         // NOTE: having a prefix for windows doesn't make sense
-        linux: linuxOpenPrefixHandler,
+        linux: linuxGameTweaksHandler,
       };
 
     const handler = handlers[Deno.build.os];

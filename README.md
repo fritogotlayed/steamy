@@ -9,7 +9,7 @@
 `steamy launch ascent -a 979690` - launches the ascent game assuming the user
 has both the game and soundtrack "installed"
 
-### Installation from locally complied binary
+### Installation from locally compiled binary
 
 #### Linux
 It is suggested to use the pre-compiled binary for the best experience. This assumes you have a `.bin` directory
@@ -26,7 +26,7 @@ in your home directory and that the directory is in your `$PATH`.
 
 To test the CLI locally:
 
-- `deno run -A ./src/main.ts [command] <args>` -- This runs the CLI locally with a JIT complied
+- `deno run -A ./src/main.ts [command] <args>` -- This runs the CLI locally with a JIT compiled binary.
 
 ## Usage Examples
 
