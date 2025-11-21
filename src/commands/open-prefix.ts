@@ -22,6 +22,7 @@ const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args) =>
 export const openPrefix = withCommonGameOptions(
   new Command()
     .name('openPrefix')
+    .alias('open-prefix')
     .description('Open the prefix folder'),
 )
   .arguments('<name...>')

@@ -1,6 +1,6 @@
 import { Command } from '@cliffy/command';
-import { readDeadRedemption2 } from './games/read-dead-redemption-2.ts';
-import type { SteamGameCommandHandlerType } from '../types.ts';
+import { redDeadRedemption2 } from './games/red-dead-redemption-2.ts';
+import type { SteamGameCommandHandlerType, TweakHandler } from '../types.ts';
 import {
   requireOsHandler,
   resolveGameAndRun,
@@ -9,19 +9,15 @@ import {
 import { GameMatch } from '../../utils/types.ts';
 
 // The key is the AppId of the game, the value is a function that applies the tweak
-const TweakHandlers: Record<string, (() => Promise<void> | void) | undefined> =
-  {
-    '1174180': () => readDeadRedemption2(),
-  };
+const TweakHandlers: Record<string, TweakHandler | undefined> = {
+  '1174180': () => redDeadRedemption2(),
+};
 
 async function linuxGameTweaks(game: GameMatch) {
   const handler = TweakHandlers[game.appId];
   if (handler) {
     console.log(`Applying tweaks for ${game.name} (${game.appId})...`);
-    const result = handler();
-    if (result?.then) {
-      await result;
-    }
+    await handler();
   } else {
     console.log(`No tweaks found for ${game.name} (${game.appId})`);
   }
@@ -33,6 +29,7 @@ const linuxGameTweaksHandler: SteamGameCommandHandlerType = (args) =>
 export const gameTweaks = withCommonGameOptions(
   new Command()
     .name('gameTweaks')
+    .alias('game-tweaks')
     .description('Tweaks for a specific games'),
 )
   .arguments('<name...>')

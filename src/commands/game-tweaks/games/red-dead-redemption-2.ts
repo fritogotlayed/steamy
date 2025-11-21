@@ -91,7 +91,7 @@ async function enablePrivateMp() {
   );
 }
 
-export async function readDeadRedemption2() {
+export async function redDeadRedemption2() {
   // NOTE: Instructions used from https://pastebin.com/r7mYw1WY
 
   const isPrivateMpEnabled = await checkIfPrivateMpEnabled();

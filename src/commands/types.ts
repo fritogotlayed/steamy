@@ -11,3 +11,5 @@ export type SteamGameCliArgument = {
 export type SteamGameCommandHandlerType = (
   args: SteamGameCliArgument,
 ) => Promise<void>;
+
+export type TweakHandler = () => Promise<void>;
