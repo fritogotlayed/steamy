@@ -3,11 +3,12 @@
  * Provides utility functions for handling Steamy CLI commands
  */
 
-import { ValidationError } from '@cliffy/command';
+import { type Command, ValidationError } from '@cliffy/command';
 import { Table } from '@cliffy/table';
-import type { GameMatch, SteamGameCliArgument } from './types.ts';
+import type { SteamGameCliArgument } from './types.ts';
 
 import { findAppIdMatches } from '../utils/find-app-id-matches.ts';
+import { GameMatch } from '../utils/types.ts';
 
 /**
  * Prints a table of matches to the console
@@ -57,4 +58,13 @@ export function requireOsHandler<T>(
     throw new ValidationError(`Unsupported OS: ${os}`);
   }
   return handler;
+}
+
+export function withCommonGameOptions(cmd: Command) {
+  return cmd
+    .option(
+      '-a, --appId <appId:string>',
+      'The AppId to use when filtering by name is ambiguous',
+    )
+    .option('-v, --verbose', 'Show verbose output');
 }

@@ -1,7 +1,12 @@
 import { Command } from '@cliffy/command';
-import type { GameMatch, SteamGameCommandHandlerType } from './types.ts';
-import { requireOsHandler, resolveGameAndRun } from './command-helpers.ts';
+import type { SteamGameCommandHandlerType } from './types.ts';
+import {
+  requireOsHandler,
+  resolveGameAndRun,
+  withCommonGameOptions,
+} from './command-helpers.ts';
 import { compatDataDir } from '../utils/steam-paths.ts';
+import { GameMatch } from '../utils/types.ts';
 
 function linuxOpenPrefix(game: GameMatch) {
   const prefixDir = compatDataDir(game.appId);
@@ -14,14 +19,11 @@ function linuxOpenPrefix(game: GameMatch) {
 const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args) =>
   resolveGameAndRun(args, linuxOpenPrefix);
 
-export const openPrefix = new Command()
-  .name('openPrefix')
-  .description('Open the prefix folder')
-  .option(
-    '-a, --appId <appId:string>',
-    'The AppId to launch if filtering by name alone will not suffice.',
-  )
-  .option('-v, --verbose', 'Show verbose output')
+export const openPrefix = withCommonGameOptions(
+  new Command()
+    .name('openPrefix')
+    .description('Open the prefix folder'),
+)
   .arguments('<name...>')
   .action(async ({ appId, verbose: _verbose }, ...name) => {
     // TODO: Implement verbose output
