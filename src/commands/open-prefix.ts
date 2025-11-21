@@ -1,23 +1,10 @@
 import { Command } from '@cliffy/command';
-import {
-  type GameMatch,
-  requireOsHandler,
-  resolveGameAndRun,
-  type SteamGameCommandHandlerType,
-} from './common.ts';
-
-const _homedir = Deno.env.get('HOME');
+import type { GameMatch, SteamGameCommandHandlerType } from './types.ts';
+import { requireOsHandler, resolveGameAndRun } from './command-helpers.ts';
+import { compatDataDir } from '../utils/steam-paths.ts';
 
 function linuxOpenPrefix(game: GameMatch) {
-  const prefixDir = [
-    _homedir,
-    '.steam',
-    'steam',
-    'steamapps',
-    'compatdata',
-    game.appId,
-  ].join('/');
-
+  const prefixDir = compatDataDir(game.appId);
   console.log(`Opening prefix for ${game.name}...`);
 
   const cmd = new Deno.Command('xdg-open', { args: [prefixDir] });

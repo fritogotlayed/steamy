@@ -1,6 +1,8 @@
-interface AcfData {
-  [key: string]: string | AcfData;
-}
+/**
+ * @packageDocumentation
+ * Utility functions for parsing Steam cache files
+ */
+import { AcfData } from './types.ts';
 
 /**
  * Converts a Map to an object

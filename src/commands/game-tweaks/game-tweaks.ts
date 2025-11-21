@@ -1,30 +1,15 @@
 import { Command } from '@cliffy/command';
-import {
-  type GameMatch,
-  requireOsHandler,
-  resolveGameAndRun,
-  SteamGameCommandHandlerType,
-} from '../common.ts';
 import { readDeadRedemption2 } from './games/read-dead-redemption-2.ts';
+import type { GameMatch, SteamGameCommandHandlerType } from '../types.ts';
+import { requireOsHandler, resolveGameAndRun } from '../command-helpers.ts';
 
-// const _homedir = Deno.env.get('HOME');
-
-// TODO: Implement tweaks for the game
+// The key is the AppId of the game, the value is a function that applies the tweak
 const TweakHandlers: Record<string, (() => Promise<void> | void) | undefined> =
   {
     '1174180': () => readDeadRedemption2(),
   };
 
 async function linuxGameTweaks(game: GameMatch) {
-  // const prefixDir = [
-  //   _homedir,
-  //   '.steam',
-  //   'steam',
-  //   'steamapps',
-  //   'compatdata',
-  //   game.appId,
-  // ].join('/');
-
   const handler = TweakHandlers[game.appId];
   if (handler) {
     console.log(`Applying tweaks for ${game.name} (${game.appId})...`);

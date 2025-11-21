@@ -1,10 +1,6 @@
 import { Command } from '@cliffy/command';
-import {
-  type GameMatch,
-  requireOsHandler,
-  resolveGameAndRun,
-  type SteamGameCommandHandlerType,
-} from './common.ts';
+import type { GameMatch, SteamGameCommandHandlerType } from './types.ts';
+import { requireOsHandler, resolveGameAndRun } from './command-helpers.ts';
 
 function linuxLaunch(game: GameMatch) {
   const cmd = new Deno.Command('steam', {

@@ -1,17 +1,13 @@
+import { join } from '@std/path';
 import { Input } from '@cliffy/prompt/input';
-import { Select, SelectOption, SelectOptionGroup } from '@cliffy/prompt/select';
+import { Select } from '@cliffy/prompt/select';
+import { gameCommonDir } from '../../../utils/steam-paths.ts';
 
-const _homedir = Deno.env.get('HOME');
-const gameDataDirectory = [
-  _homedir,
-  '.steam',
-  'steam',
-  'steamapps',
-  'common',
-  'Red Dead Redemption 2',
+const gameDataDirectory = join(
+  gameCommonDir('Red Dead Redemption 2'),
   'x64',
   'data',
-].join('/');
+);
 const privateMpFileName = 'startup.meta';
 
 function checkIfPrivateMpEnabled() {
@@ -99,13 +95,13 @@ export async function readDeadRedemption2() {
   // NOTE: Instructions used from https://pastebin.com/r7mYw1WY
 
   const isPrivateMpEnabled = await checkIfPrivateMpEnabled();
-  const options: (
-    | string
-    // | GenericListSeparatorOption // NOTE: Couldn't find type for this
-    | SelectOption<string>
-    | SelectOptionGroup<string>
-  )[] = [
+
+  type SelectPromptOptions = NonNullable<
+    Parameters<typeof Select.prompt>[0]
+  >['options'][number];
+  const options: SelectPromptOptions[] = [
     { name: 'Cancel', value: 'cancel' },
+    Select.separator('-----'),
   ];
 
   if (isPrivateMpEnabled) {
@@ -115,7 +111,7 @@ export async function readDeadRedemption2() {
   }
 
   // https://cliffy.io/docs@v1.0.0-rc.8/prompt/types/select
-  const option: string = await Select.prompt({
+  const option = await Select.prompt({
     message: 'Pick a tweak',
     options,
   });
