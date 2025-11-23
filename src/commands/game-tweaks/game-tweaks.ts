@@ -1,89 +1,44 @@
-import { Table } from '@cliffy/table';
-import { Command, ValidationError } from '@cliffy/command';
+import { Command } from '@cliffy/command';
+import { redDeadRedemption2 } from './games/red-dead-redemption-2.ts';
+import type { SteamGameCommandHandlerType, TweakHandler } from '../types.ts';
 import {
-  findAppIdMatches,
-  type GameMatch,
-  SteamGameCommandHandlerType,
-} from '../common.ts';
-import { readDeadRedemption2 } from './games/read-dead-redemption-2.ts';
+  requireOsHandler,
+  resolveGameAndRun,
+  withCommonGameOptions,
+} from '../command-helpers.ts';
+import { GameMatch } from '../../utils/types.ts';
 
-// const _homedir = Deno.env.get('HOME');
-
-// TODO: Implement tweaks for the game
-const TweakHandlers: Record<string, (() => Promise<void> | void) | undefined> =
-  {
-    '1174180': () => readDeadRedemption2(),
-  };
+// The key is the AppId of the game, the value is a function that applies the tweak
+const TweakHandlers: Record<string, TweakHandler | undefined> = {
+  '1174180': () => redDeadRedemption2(),
+};
 
 async function linuxGameTweaks(game: GameMatch) {
-  // const prefixDir = [
-  //   _homedir,
-  //   '.steam',
-  //   'steam',
-  //   'steamapps',
-  //   'compatdata',
-  //   game.appId,
-  // ].join('/');
-
   const handler = TweakHandlers[game.appId];
   if (handler) {
     console.log(`Applying tweaks for ${game.name} (${game.appId})...`);
-    const result = handler();
-    if (result?.then) {
-      await result;
-    }
+    await handler();
   } else {
     console.log(`No tweaks found for ${game.name} (${game.appId})`);
   }
 }
 
-const linuxGameTweaksHandler: SteamGameCommandHandlerType = async (
-  { appId, name },
-) => {
-  if (appId) {
-    await linuxGameTweaks({ appId, name });
-    return;
-  }
+const linuxGameTweaksHandler: SteamGameCommandHandlerType = (args) =>
+  resolveGameAndRun(args, linuxGameTweaks);
 
-  const matches = await findAppIdMatches(name);
-
-  if (matches.length === 0) {
-    console.log(`No matches found for ${name}. Are you sure it is installed?`);
-  } else if (matches.length > 1) {
-    console.log(`Multiple matches found for ${name}.`);
-    new Table()
-      .body(matches.map((match) => [match.appId, match.name]))
-      .header(['AppId', 'Name'])
-      .border(true)
-      .render();
-  } else {
-    await linuxGameTweaks(matches[0]);
-  }
-};
-
-export const gameTweaks = new Command()
-  .name('gameTweaks')
-  .description('Tweaks for a specific games')
-  .option(
-    '-a, --appId <appId:string>',
-    'The AppId to launch if filtering by name alone will not suffice.',
-  )
-  .option('-v, --verbose', 'Show verbose output')
+export const gameTweaks = withCommonGameOptions(
+  new Command()
+    .name('gameTweaks')
+    .alias('game-tweaks')
+    .description('Tweaks for a specific games'),
+)
   .arguments('<name...>')
   .action(async ({ appId, verbose: _verbose }, ...name) => {
     // TODO: Implement verbose output
     const gameName = name.join(' ');
 
-    const handlers: Record<string, (undefined | SteamGameCommandHandlerType)> =
-      {
-        // NOTE: having a prefix for windows doesn't make sense
-        linux: linuxGameTweaksHandler,
-      };
-
-    const handler = handlers[Deno.build.os];
-    if (!handler) {
-      throw new ValidationError(`Unsupported OS: ${Deno.build.os}`);
-    }
-
+    const handler = requireOsHandler({
+      linux: linuxGameTweaksHandler,
+    });
     await handler({ appId, name: gameName });
   });

@@ -1,76 +1,38 @@
-import { Table } from '@cliffy/table';
-import { Command, ValidationError } from '@cliffy/command';
+import { Command } from '@cliffy/command';
+import type { SteamGameCommandHandlerType } from './types.ts';
 import {
-  findAppIdMatches,
-  type GameMatch,
-  type SteamGameCommandHandlerType,
-} from './common.ts';
-
-const _homedir = Deno.env.get('HOME');
+  requireOsHandler,
+  resolveGameAndRun,
+  withCommonGameOptions,
+} from './command-helpers.ts';
+import { compatDataDir } from '../utils/steam-paths.ts';
+import { GameMatch } from '../utils/types.ts';
 
 function linuxOpenPrefix(game: GameMatch) {
-  const prefixDir = [
-    _homedir,
-    '.steam',
-    'steam',
-    'steamapps',
-    'compatdata',
-    game.appId,
-  ].join('/');
-
+  const prefixDir = compatDataDir(game.appId);
   console.log(`Opening prefix for ${game.name}...`);
 
   const cmd = new Deno.Command('xdg-open', { args: [prefixDir] });
   cmd.spawn();
 }
 
-const linuxOpenPrefixHandler: SteamGameCommandHandlerType = async (
-  { appId, name },
-) => {
-  if (appId) {
-    linuxOpenPrefix({ appId, name });
-    return;
-  }
+const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args) =>
+  resolveGameAndRun(args, linuxOpenPrefix);
 
-  const matches = await findAppIdMatches(name);
-
-  if (matches.length === 0) {
-    console.log(`No matches found for ${name}. Are you sure it is installed?`);
-  } else if (matches.length > 1) {
-    console.log(`Multiple matches found for ${name}.`);
-    new Table()
-      .body(matches.map((match) => [match.appId, match.name]))
-      .header(['AppId', 'Name'])
-      .border(true)
-      .render();
-  } else {
-    linuxOpenPrefix(matches[0]);
-  }
-};
-
-export const openPrefix = new Command()
-  .name('openPrefix')
-  .description('Open the prefix folder')
-  .option(
-    '-a, --appId <appId:string>',
-    'The AppId to launch if filtering by name alone will not suffice.',
-  )
-  .option('-v, --verbose', 'Show verbose output')
+export const openPrefix = withCommonGameOptions(
+  new Command()
+    .name('openPrefix')
+    .alias('open-prefix')
+    .description('Open the prefix folder'),
+)
   .arguments('<name...>')
   .action(async ({ appId, verbose: _verbose }, ...name) => {
     // TODO: Implement verbose output
     const gameName = name.join(' ');
 
-    const handlers: Record<string, (undefined | SteamGameCommandHandlerType)> =
-      {
-        // NOTE: having a prefix for windows doesn't make sense
-        linux: linuxOpenPrefixHandler,
-      };
-
-    const handler = handlers[Deno.build.os];
-    if (!handler) {
-      throw new ValidationError(`Unsupported OS: ${Deno.build.os}`);
-    }
-
+    const handler = requireOsHandler({
+      // NOTE: having a prefix for windows doesn't make sense
+      linux: linuxOpenPrefixHandler,
+    });
     await handler({ appId, name: gameName });
   });
