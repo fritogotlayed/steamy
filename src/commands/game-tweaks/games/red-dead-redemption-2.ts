@@ -1,7 +1,8 @@
 import { join } from '@std/path';
 import { Input } from '@cliffy/prompt/input';
 import { Select } from '@cliffy/prompt/select';
-import { gameCommonDir } from '../../../utils/steam-paths.ts';
+import { gameCommonDir } from '../../../core/steam/paths.ts';
+import { Logger } from '../../../core/logger.ts';
 
 const gameDataDirectory = join(
   gameCommonDir('Red Dead Redemption 2'),
@@ -17,13 +18,13 @@ function checkIfPrivateMpEnabled() {
   ).then(() => true).catch(() => false);
 }
 
-async function disablePrivateMp() {
+async function disablePrivateMp(logger: Logger) {
   // Delete the private multiplayer file
   await Deno.remove(`${gameDataDirectory}/${privateMpFileName}`);
-  console.log('Private MP disabled. You will now play in public mode.');
+  logger.info('Private MP disabled. You will now play in public mode.');
 }
 
-async function enablePrivateMp() {
+async function enablePrivateMp(logger: Logger) {
   // Collect the private code word from the user
   const codeWord: string = await Input.prompt(
     'What is the shared code word between players you wish to play with?',
@@ -86,12 +87,12 @@ async function enablePrivateMp() {
       ' <patchFiles />\n' +
       `</CDataFileMgr__ContentsOfDataFileXml>${codeWord}`,
   );
-  console.log(
+  logger.info(
     'Private MP enabled. You will now play with players you share the code word with.',
   );
 }
 
-export async function redDeadRedemption2() {
+export async function redDeadRedemption2(logger: Logger) {
   // NOTE: Instructions used from https://pastebin.com/r7mYw1WY
 
   const isPrivateMpEnabled = await checkIfPrivateMpEnabled();
@@ -118,13 +119,13 @@ export async function redDeadRedemption2() {
 
   switch (option) {
     case 'disablePrivateMp':
-      await disablePrivateMp();
+      await disablePrivateMp(logger);
       break;
     case 'enablePrivateMp':
-      await enablePrivateMp();
+      await enablePrivateMp(logger);
       break;
     default:
       // Cancel
-      console.log('Cancelled tweak');
+      logger.info('Cancelled tweak');
   }
 }

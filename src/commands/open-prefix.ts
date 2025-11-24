@@ -5,19 +5,20 @@ import {
   resolveGameAndRun,
   withCommonGameOptions,
 } from './command-helpers.ts';
-import { compatDataDir } from '../utils/steam-paths.ts';
-import { GameMatch } from '../utils/types.ts';
+import { compatDataDir } from '../core/steam/paths.ts';
+import { GameMatch } from '../core/types.ts';
+import { createLogger, Logger } from '../core/logger.ts';
 
-function linuxOpenPrefix(game: GameMatch) {
+function linuxOpenPrefix(game: GameMatch, logger: Logger) {
   const prefixDir = compatDataDir(game.appId);
-  console.log(`Opening prefix for ${game.name}...`);
+  logger.info(`Opening prefix for ${game.name}...`);
 
   const cmd = new Deno.Command('xdg-open', { args: [prefixDir] });
   cmd.spawn();
 }
 
-const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args) =>
-  resolveGameAndRun(args, linuxOpenPrefix);
+const linuxOpenPrefixHandler: SteamGameCommandHandlerType = (args, logger) =>
+  resolveGameAndRun(args, linuxOpenPrefix, logger);
 
 export const openPrefix = withCommonGameOptions(
   new Command()
@@ -26,13 +27,13 @@ export const openPrefix = withCommonGameOptions(
     .description('Open the prefix folder'),
 )
   .arguments('<name...>')
-  .action(async ({ appId, verbose: _verbose }, ...name) => {
-    // TODO: Implement verbose output
+  .action(async ({ appId, verbose }, ...name) => {
+    const logger = createLogger(verbose);
     const gameName = name.join(' ');
 
     const handler = requireOsHandler({
       // NOTE: having a prefix for windows doesn't make sense
       linux: linuxOpenPrefixHandler,
     });
-    await handler({ appId, name: gameName });
+    await handler({ appId, name: gameName }, logger);
   });

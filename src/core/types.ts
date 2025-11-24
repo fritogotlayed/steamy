@@ -8,13 +8,13 @@ export type GameMatch = {
   name: string;
 };
 
-export type AcfFileFragment = {
+export type CacheFileFragment = {
   AppState: {
     appid: string;
     name: string;
   };
 };
 
-export type AcfData = {
-  [key: string]: string | AcfData;
+export type CacheData = {
+  [key: string]: string | CacheData;
 };
