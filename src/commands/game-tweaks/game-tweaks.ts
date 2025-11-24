@@ -6,25 +6,26 @@ import {
   resolveGameAndRun,
   withCommonGameOptions,
 } from '../command-helpers.ts';
-import { GameMatch } from '../../utils/types.ts';
+import { GameMatch } from '../../core/types.ts';
+import { createLogger, Logger } from '../../core/logger.ts';
 
 // The key is the AppId of the game, the value is a function that applies the tweak
 const TweakHandlers: Record<string, TweakHandler | undefined> = {
-  '1174180': () => redDeadRedemption2(),
+  '1174180': (logger) => redDeadRedemption2(logger),
 };
 
-async function linuxGameTweaks(game: GameMatch) {
+async function linuxGameTweaks(game: GameMatch, logger: Logger) {
   const handler = TweakHandlers[game.appId];
   if (handler) {
-    console.log(`Applying tweaks for ${game.name} (${game.appId})...`);
-    await handler();
+    logger.info(`Applying tweaks for ${game.name} (${game.appId})...`);
+    await handler(logger);
   } else {
-    console.log(`No tweaks found for ${game.name} (${game.appId})`);
+    logger.info(`No tweaks found for ${game.name} (${game.appId})`);
   }
 }
 
-const linuxGameTweaksHandler: SteamGameCommandHandlerType = (args) =>
-  resolveGameAndRun(args, linuxGameTweaks);
+const linuxGameTweaksHandler: SteamGameCommandHandlerType = (args, logger) =>
+  resolveGameAndRun(args, linuxGameTweaks, logger);
 
 export const gameTweaks = withCommonGameOptions(
   new Command()
@@ -33,12 +34,12 @@ export const gameTweaks = withCommonGameOptions(
     .description('Tweaks for a specific games'),
 )
   .arguments('<name...>')
-  .action(async ({ appId, verbose: _verbose }, ...name) => {
-    // TODO: Implement verbose output
+  .action(async ({ appId, verbose }, ...name) => {
+    const logger = createLogger(verbose);
     const gameName = name.join(' ');
 
     const handler = requireOsHandler({
       linux: linuxGameTweaksHandler,
     });
-    await handler({ appId, name: gameName });
+    await handler({ appId, name: gameName }, logger);
   });

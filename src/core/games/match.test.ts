@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import { findAppIdMatches } from './find-app-id-matches.ts';
+import { findAppIdMatches } from './match.ts';
 import { stub } from '@std/testing/mock';
+import { SteamyError } from '../errors.ts';
 
 function makeDirEntries(names: string[]): AsyncIterable<Deno.DirEntry> {
   async function* gen() {
@@ -138,7 +139,7 @@ Deno.test('findAppIdMatches wraps readDir errors', async () => {
   try {
     await assertRejects(
       () => findAppIdMatches('anything'),
-      Error,
+      SteamyError,
       'Failed to access Steam directory: permission denied',
     );
   } finally {

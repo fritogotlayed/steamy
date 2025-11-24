@@ -6,7 +6,7 @@ import {
   requireHomeDir,
   steamAppsDir,
   steamRootDir,
-} from './steam-paths.ts';
+} from './paths.ts';
 import { stub } from '@std/testing/mock';
 
 Deno.test('requireHomeDir returns HOME when set', () => {

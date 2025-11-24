@@ -2,15 +2,15 @@
  * @packageDocumentation
  * Utility functions for parsing Steam cache files
  */
-import { AcfData } from './types.ts';
+import { CacheData } from '../types.ts';
 
 /**
  * Converts a Map to an object
  * @param map - The Map to convert
  * @returns Object representation of the Map
  */
-function mapToObject(map: Map<string, unknown>): AcfData {
-  const obj: AcfData = {};
+function mapToObject(map: Map<string, unknown>): CacheData {
+  const obj: CacheData = {};
   for (const [key, value] of map) {
     obj[key] = value instanceof Map ? mapToObject(value) : value as string;
   }
@@ -18,7 +18,9 @@ function mapToObject(map: Map<string, unknown>): AcfData {
 }
 
 const utf8TextDecoder = new TextDecoder('utf-8');
-export async function parseSteamCacheFile(filePath: string): Promise<AcfData> {
+export async function parseSteamCacheFile(
+  filePath: string,
+): Promise<CacheData> {
   if (filePath.endsWith('.acf') || filePath.endsWith('.vdf')) {
     const fileBody = await Deno.readFile(filePath);
     return parseSteamCacheBody(
@@ -34,7 +36,7 @@ export async function parseSteamCacheFile(filePath: string): Promise<AcfData> {
  * @returns Parsed object containing ACF fields and values
  * @throws {Error} When input is invalid or parsing fails
  */
-export function parseSteamCacheBody(body: string): AcfData {
+export function parseSteamCacheBody(body: string): CacheData {
   if (!body || typeof body !== 'string') {
     throw new Error('Invalid input: body must be a non-empty string');
   }

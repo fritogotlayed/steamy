@@ -1,5 +1,5 @@
 import { assertEquals, assertThrows } from '@std/assert';
-import { parseSteamCacheBody } from './parse-steam-caches.ts';
+import { parseSteamCacheBody } from './cache-parser.ts';
 
 Deno.test('parseSteamCaches - basic key-value parsing', () => {
   const input = `"key1"\n{\n\t"value1"\t"data1"\n}`;
