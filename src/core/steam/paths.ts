@@ -37,6 +37,13 @@ export function compatDataDir(appId: string) {
 }
 
 /**
+ * Returns the path to the Proton prefix directory
+ */
+export function protonPrefixDir() {
+  return join(steamRootDir(), 'compatibilitytools.d');
+}
+
+/**
  * Returns the path to the common directory for the specified game
  * @param folderName - The name of the game folder
  */

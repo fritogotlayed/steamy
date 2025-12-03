@@ -73,11 +73,14 @@ export function requireOsHandler<T>(
   return handler;
 }
 
+export function withBaseOptions(cmd: Command) {
+  return cmd.option('-v, --verbose', 'Show verbose output');
+}
+
 export function withCommonGameOptions(cmd: Command) {
-  return cmd
+  return withBaseOptions(cmd)
     .option(
       '-a, --appId <appId:string>',
       'The AppId to use when filtering by name is ambiguous',
-    )
-    .option('-v, --verbose', 'Show verbose output');
+    );
 }

@@ -12,6 +12,14 @@ export type CacheFileFragment = {
   AppState: {
     appid: string;
     name: string;
+    installdir: string;
+    StateFlags: string;
+    DownloadType: string;
+    SizeOnDisk: string; // Bytes
+    UserConfig: {
+      highqualityaudio?: string;
+      language?: string;
+    };
   };
 };
 
