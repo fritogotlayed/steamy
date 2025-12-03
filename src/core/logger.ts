@@ -7,6 +7,7 @@ export interface Logger {
   info(msg: string, ...args: unknown[]): void;
   debug(msg: string, ...args: unknown[]): void;
   error(msg: string, ...args: unknown[]): void;
+  isDebugEnabled(): boolean;
 }
 
 export function createLogger(verbose: boolean = false): Logger {
@@ -16,5 +17,6 @@ export function createLogger(verbose: boolean = false): Logger {
       if (verbose) console.error(msg, ...args);
     },
     error: (msg: string, ...args: unknown[]) => console.error(msg, ...args),
+    isDebugEnabled: () => verbose,
   };
 }
