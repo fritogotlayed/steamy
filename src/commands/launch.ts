@@ -10,7 +10,7 @@ import { createLogger, Logger } from '../core/logger.ts';
 
 // Checks for an exact process name match via `pgrep -x`
 export async function isProcessRunningByName(name: string): Promise<boolean> {
-  const cmd = new Deno.Command("pgrep", { args: ["-x", name] });
+  const cmd = new Deno.Command('pgrep', { args: ['-x', name] });
   try {
     const { code } = await cmd.output();
     return code === 0; // 0 if one or more PIDs matched
@@ -43,12 +43,16 @@ async function linuxLaunch(game: GameMatch, logger: Logger) {
 
   if (debug) {
     const dec = new TextDecoder();
-    void proc.stdout?.pipeTo(new WritableStream({
-      write: (chunk) => logger.debug(dec.decode(chunk)),
-    }));
-    void proc.stderr?.pipeTo(new WritableStream({
-      write: (chunk) => logger.debug(dec.decode(chunk)),
-    }));
+    void proc.stdout?.pipeTo(
+      new WritableStream({
+        write: (chunk) => logger.debug(dec.decode(chunk)),
+      }),
+    );
+    void proc.stderr?.pipeTo(
+      new WritableStream({
+        write: (chunk) => logger.debug(dec.decode(chunk)),
+      }),
+    );
   }
 }
 
