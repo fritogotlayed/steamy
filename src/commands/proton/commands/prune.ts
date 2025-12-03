@@ -48,7 +48,7 @@ const linuxHandler = async (logger: Logger) => {
     if (selectedVersions.length > 0) {
       const totalSize = selectedVersions.reduce(
         (acc, version) =>
-          acc + withSizes.find((e) => e.version === version)?.size || 0,
+          acc + (withSizes.find((e) => e.version === version)?.size || 0),
         0,
       );
       logger.info(
