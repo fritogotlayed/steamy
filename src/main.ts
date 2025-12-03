@@ -2,6 +2,7 @@ import { Command, ValidationError } from '@cliffy/command';
 import { openPrefix } from './commands/open-prefix.ts';
 import { launch } from './commands/launch.ts';
 import { gameTweaks } from './commands/game-tweaks/game-tweaks.ts';
+import { proton } from './commands/proton/proton.ts';
 import { getExitCode, SteamyError } from './core/errors.ts';
 
 try {
@@ -15,6 +16,7 @@ try {
     .command('openPrefix', openPrefix)
     .command('launch', launch)
     .command('gameTweaks', gameTweaks)
+    .command('proton', proton)
     .parse(Deno.args);
 } catch (e: unknown) {
   if (e instanceof SteamyError) {
