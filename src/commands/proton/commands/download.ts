@@ -1,20 +1,13 @@
 import { copy, readerFromStreamReader } from '@std/io';
 import { Command } from '@cliffy/command';
-import { join } from '@std/path';
 import { requireOsHandler, withBaseOptions } from '../../command-helpers.ts';
 import { createLogger, Logger } from '../../../core/logger.ts';
 import { protonPrefixDir } from '../../../core/steam/paths.ts';
-import { Table } from '@cliffy/table';
-import { IGNORE_VERSIONS } from '../constants.ts';
 import {
-  dirSize,
   extractWithSystemTar,
   sizeToHumanReadable,
 } from '../../../core/utils.ts';
-import {
-  getInstalledProtonVersions,
-  getProtonMappings,
-} from '../../../core/steam/proton.ts';
+import { getInstalledProtonVersions } from '../../../core/steam/proton.ts';
 import { SteamyError } from '../../../core/errors.ts';
 import { startSpinner } from '../../../core/spinner.ts';
 
