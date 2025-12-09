@@ -1,31 +1,18 @@
 import { Command } from '@cliffy/command';
-import { join } from '@std/path';
 import { requireOsHandler, withBaseOptions } from '../../command-helpers.ts';
 import { createLogger, Logger } from '../../../core/logger.ts';
 import { protonPrefixDir } from '../../../core/steam/paths.ts';
 import { Table } from '@cliffy/table';
-import { IGNORE_VERSIONS } from '../constants.ts';
-import { dirSize, sizeToHumanReadable } from '../../../core/utils.ts';
-import { getProtonMappings } from '../../../core/steam/proton.ts';
+import {
+  getInstalledProtonVersions,
+  getProtonMappings,
+} from '../../../core/steam/proton.ts';
 
 const linuxHandler = async (logger: Logger) => {
   const rootDir = protonPrefixDir();
 
-  const protonVersions = new Set<string>();
   logger.info(`Listing Proton versions installed in ${rootDir}...`);
-  for await (const entry of Deno.readDir(rootDir)) {
-    if (entry.isDirectory) {
-      if (!IGNORE_VERSIONS.includes(entry.name)) {
-        if (logger.isDebugEnabled()) {
-          const size = await dirSize(join(rootDir, entry.name));
-          const humanSize = sizeToHumanReadable(size);
-          logger.debug(`Found Proton version ${entry.name} @ ${humanSize}`);
-        }
-        protonVersions.add(entry.name);
-      }
-    }
-  }
-
+  const protonVersions = await getInstalledProtonVersions({ rootDir, logger });
   const games = await getProtonMappings();
 
   // Print alphabetized list

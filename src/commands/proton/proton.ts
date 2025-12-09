@@ -1,6 +1,7 @@
 import { Command, ValidationError } from '@cliffy/command';
 import { list } from './commands/list.ts';
 import { prune } from './commands/prune.ts';
+import { download } from './commands/download.ts';
 
 export const proton = new Command()
   .name('proton')
@@ -10,4 +11,5 @@ export const proton = new Command()
     throw new ValidationError('Missing sub-command');
   })
   .command('list', list)
-  .command('prune', prune);
+  .command('prune', prune)
+  .command('download', download);

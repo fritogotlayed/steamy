@@ -4,6 +4,8 @@ import { parseSteamCacheBody } from './cache-parser.ts';
 import { scanSteamCacheFragments } from '../games/match.ts';
 import { SteamyError } from '../errors.ts';
 import { IGNORE_VERSIONS } from '../../commands/proton/constants.ts';
+import { Logger } from '../logger.ts';
+import { dirSize, sizeToHumanReadable } from '../utils.ts';
 
 export type ProtonMapping = {
   appid: string;
@@ -58,9 +60,11 @@ export async function getProtonMappings() {
 export async function getInstalledProtonVersions({
   rootDir,
   ignoreVersions,
+  logger,
 }: {
   rootDir?: string;
   ignoreVersions?: string[];
+  logger?: Logger;
 } = {}) {
   const dir = rootDir ?? protonPrefixDir();
   const ignore = ignoreVersions ?? IGNORE_VERSIONS;
@@ -69,6 +73,11 @@ export async function getInstalledProtonVersions({
   for await (const entry of Deno.readDir(dir)) {
     if (entry.isDirectory) {
       if (!ignore.includes(entry.name)) {
+        if (logger?.isDebugEnabled()) {
+          const size = await dirSize(join(dir, entry.name));
+          const humanSize = sizeToHumanReadable(size);
+          logger?.debug(`Found Proton version ${entry.name} @ ${humanSize}`);
+        }
         protonVersions.add(entry.name);
       }
     }
