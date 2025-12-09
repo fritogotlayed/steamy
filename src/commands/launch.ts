@@ -7,18 +7,7 @@ import {
 } from './command-helpers.ts';
 import { GameMatch } from '../core/types.ts';
 import { createLogger, Logger } from '../core/logger.ts';
-
-// Checks for an exact process name match via `pgrep -x`
-export async function isProcessRunningByName(name: string): Promise<boolean> {
-  const cmd = new Deno.Command('pgrep', { args: ['-x', name] });
-  try {
-    const { code } = await cmd.output();
-    return code === 0; // 0 if one or more PIDs matched
-  } catch (_) {
-    // pgrep not found or other error
-    return false;
-  }
-}
+import { isProcessRunningByName } from '../core/utils.ts';
 
 async function linuxLaunch(game: GameMatch, logger: Logger) {
   const isSteamRunning = await isProcessRunningByName('steam');

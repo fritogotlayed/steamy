@@ -3,7 +3,8 @@ export type SteamyErrorCode =
   | 'GAME_AMBIGUOUS'
   | 'UNSUPPORTED_OS'
   | 'GAME_NOT_FOUND'
-  | 'UNKNOWN_ERROR';
+  | 'UNKNOWN_ERROR'
+  | 'EXTERNAL_DEPENDENCY_ERROR';
 
 export class SteamyError extends Error {
   constructor(
@@ -26,6 +27,8 @@ export function getExitCode(code: SteamyErrorCode): number {
       return 4;
     case 'GAME_NOT_FOUND':
       return 5;
+    case 'EXTERNAL_DEPENDENCY_ERROR':
+      return 6;
     case 'UNKNOWN_ERROR':
       return 1;
     default:
