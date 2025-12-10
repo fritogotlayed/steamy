@@ -4,6 +4,7 @@ import { launch } from './commands/launch.ts';
 import { gameTweaks } from './commands/game-tweaks/game-tweaks.ts';
 import { proton } from './commands/proton/proton.ts';
 import { getExitCode, SteamyError } from './core/errors.ts';
+import { BUILT_AT, COMMIT, VERSION } from './version.ts';
 
 try {
   await new Command()
@@ -13,6 +14,7 @@ try {
     .action(() => {
       throw new ValidationError('Missing sub-command');
     })
+    .version(`${VERSION} (${COMMIT}) built at ${BUILT_AT}`)
     .command('openPrefix', openPrefix)
     .command('launch', launch)
     .command('gameTweaks', gameTweaks)

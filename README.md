@@ -9,6 +9,12 @@
 `steamy launch ascent -a 979690` - launches the ascent game assuming the user
 has both the game and soundtrack "installed"
 
+`steamy proton list` - lists all proton versions installed and their associated games
+
+`steamy proton prune` - removes all proton versions that are not associated with any games
+
+`steamy proton download` - checks for and downloads the latest version of GE proton
+
 ### Installation from locally compiled binary
 
 #### Linux
