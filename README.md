@@ -30,6 +30,9 @@ in your home directory and that the directory is in your `$PATH`.
 
 ### Development
 
+1. `deno install` - Install the dependencies for the CLI.
+2. `deno task setup` - This will generate a version.ts file that is required for the CLI to run.
+
 To test the CLI locally:
 
 - `deno run -A ./src/main.ts [command] <args>` -- This runs the CLI locally with a JIT compiled binary.
