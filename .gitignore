@@ -6,3 +6,6 @@ coverage/
 
 # Build output files
 bin/
+
+# Now that this is in source control we don't need to update it since it is updated by the release build
+src/version.ts
