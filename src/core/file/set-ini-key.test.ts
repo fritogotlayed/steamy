@@ -22,7 +22,12 @@ Deno.test('setOrUpdateIniKey updates existing key preserving delimiter and spaci
   });
 
   try {
-    const res = await setOrUpdateIniKey('/fake.ini', 'Video', 'Resolution', '1280x720');
+    const res = await setOrUpdateIniKey(
+      '/fake.ini',
+      'Video',
+      'Resolution',
+      '1280x720',
+    );
     assertEquals(res.updated, 1);
     assertEquals(res.inserted, false);
     const expected = [
@@ -60,7 +65,12 @@ Deno.test('setOrUpdateIniKey inserts key at the end of existing section when mis
   });
 
   try {
-    const res = await setOrUpdateIniKey('/f.ini', 'Gameplay', 'AutoSave', 'true');
+    const res = await setOrUpdateIniKey(
+      '/f.ini',
+      'Gameplay',
+      'AutoSave',
+      'true',
+    );
     assertEquals(res.updated, 0);
     assertEquals(res.inserted, true);
     const expected = [
@@ -147,7 +157,9 @@ Deno.test('setOrUpdateIniKey preserves BOM and triggers backup when writing', as
   });
 
   try {
-    const res = await setOrUpdateIniKey('/f.ini', 'S', 'K', 'new', { backupOriginalFile: true });
+    const res = await setOrUpdateIniKey('/f.ini', 'S', 'K', 'new', {
+      backupOriginalFile: true,
+    });
     assertEquals(res.updated, 1);
     assertEquals(res.inserted, false);
     if (!written.startsWith('\uFEFF')) {

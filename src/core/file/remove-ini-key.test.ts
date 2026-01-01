@@ -13,7 +13,11 @@ Deno.test('removeIniKey removes matching key within a section and preserves form
     'Volume=75',
   ].join('\n') + '\n';
 
-  const readStub = stub(Deno, 'readTextFile', (_: string | URL) => Promise.resolve(iniBody));
+  const readStub = stub(
+    Deno,
+    'readTextFile',
+    (_: string | URL) => Promise.resolve(iniBody),
+  );
   let writtenPath = '';
   let writtenBody = '';
   const writeStub = stub(
@@ -108,14 +112,20 @@ Deno.test('removeIniKey with backupOriginalFile triggers copyFile once when chan
   const readStub = stub(Deno, 'readTextFile', () => Promise.resolve(iniBody));
 
   let copied = 0;
-  const copyStub = stub(Deno, 'copyFile', (_from: string | URL, _to: string | URL) => {
-    copied++;
-    return Promise.resolve();
-  });
+  const copyStub = stub(
+    Deno,
+    'copyFile',
+    (_from: string | URL, _to: string | URL) => {
+      copied++;
+      return Promise.resolve();
+    },
+  );
   const writeStub = stub(Deno, 'writeTextFile', () => Promise.resolve());
 
   try {
-    const res = await removeIniKey('/tmp/x.ini', 'S', 'Key', { backupOriginalFile: true });
+    const res = await removeIniKey('/tmp/x.ini', 'S', 'Key', {
+      backupOriginalFile: true,
+    });
     assertEquals(res.removed, 1);
     assertEquals(copied, 1);
   } finally {
