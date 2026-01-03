@@ -1,5 +1,6 @@
 import { Command } from '@cliffy/command';
 import { redDeadRedemption2 } from './games/red-dead-redemption-2.ts';
+import { abioticFactor } from './games/abiotic-factor.ts';
 import type { SteamGameCommandHandlerType, TweakHandler } from '../types.ts';
 import {
   requireOsHandler,
@@ -12,6 +13,7 @@ import { createLogger, Logger } from '../../core/logger.ts';
 // The key is the AppId of the game, the value is a function that applies the tweak
 const TweakHandlers: Record<string, TweakHandler | undefined> = {
   '1174180': (logger) => redDeadRedemption2(logger),
+  '427410': (logger) => abioticFactor(logger),
 };
 
 async function linuxGameTweaks(game: GameMatch, logger: Logger) {
