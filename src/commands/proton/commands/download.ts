@@ -76,8 +76,8 @@ const linuxHandler = async (logger: Logger) => {
 
     // Download the release tarball
     const asset = latestRelease.assets.find((e) =>
-      e.content_type === 'application/x-gtar'
-    )!;
+      e.name === `${latestRelease.tag_name}.tar.gz`
+    );
     const downloadUrl = asset?.browser_download_url;
     if (!asset || !downloadUrl) {
       throw new SteamyError(
