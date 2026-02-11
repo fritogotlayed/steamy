@@ -19,6 +19,8 @@ has both the game and soundtrack "installed"
 
 `steamy proton download` - checks for and downloads the latest version of GE proton
 
+`steamy update` - updates steamy to the latest release
+
 ### Installation from locally compiled binary
 
 #### Linux
@@ -32,6 +34,11 @@ Ex: `ln -s /path/to/steamy-linux-x86_64 $HOME/.bin/steamy`
 Alternatively, you can compile the binary yourself if you have [deno](https://deno.land/) installed. It is recommended
 to use the latest stable version of deno. If you plan on contributing to the project, please ensure you have read the
 [CONTRIBUTING.md](https://github.com/fritogotlayed/steamy/blob/main/CONTRIBUTING.md) file.
+
+### Update Notifications
+
+Steamy will periodically check for new versions and display a notification after commands when an update is available.
+To suppress this, set the environment variable `STEAMY_NO_UPDATE_CHECK=1`.
 
 ### Uninstallation
 
@@ -64,6 +71,7 @@ Commands:
   launch                   <name...>  - Attempts to launch a steam game by name
   gameTweaks, game-tweaks  <name...>  - Tweaks for a specific games
   proton                              - Helpers to manage Proton versions
+  update                              - Update steamy to the latest version
 ```
 
 `steamy <command> --help` - displays the help menu for a specific command

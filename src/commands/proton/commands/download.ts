@@ -1,7 +1,7 @@
 import { copy, readerFromStreamReader } from '@std/io';
 import { Command } from '@cliffy/command';
 import { requireOsHandler, withBaseOptions } from '../../command-helpers.ts';
-import { createLogger, Logger } from '../../../core/logger.ts';
+import { createLogger, type Logger } from '../../../core/logger.ts';
 import { protonPrefixDir } from '../../../core/steam/paths.ts';
 import {
   extractWithSystemTar,
@@ -10,48 +10,7 @@ import {
 import { getInstalledProtonVersions } from '../../../core/steam/proton.ts';
 import { SteamyError } from '../../../core/errors.ts';
 import { startSpinner } from '../../../core/spinner.ts';
-
-// NOTE: this is a partial type definition for the response data from the GitHub API.
-type ReleasesResponseData = {
-  id: number;
-  tag_name: string;
-  published_at: string; // ISO 8601 date string
-  body: string;
-  assets: {
-    name: string;
-    content_type: string;
-    browser_download_url: string;
-    size: number;
-  }[];
-};
-
-async function getLatestRelease({
-  owner,
-  repo,
-  logger,
-}: {
-  owner: string;
-  repo: string;
-  logger: Logger;
-}) {
-  const response = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/releases`,
-  );
-  if (!response.ok) {
-    logger.debug(
-      `Failed to fetch releases from GitHub: Received HTTP ${response.statusText} when making request.`,
-    );
-    throw new SteamyError(
-      `Failed to fetch releases from GitHub: ${response.statusText}`,
-      'EXTERNAL_DEPENDENCY_ERROR',
-    );
-  }
-  const releases: ReleasesResponseData[] = await response.json();
-  const orderedReleases = releases.sort((a, b) =>
-    new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-  );
-  return orderedReleases[0];
-}
+import { getLatestRelease } from '../../../core/update/github-releases.ts';
 
 const linuxHandler = async (logger: Logger) => {
   const rootDir = protonPrefixDir();
@@ -65,6 +24,13 @@ const linuxHandler = async (logger: Logger) => {
     repo: 'proton-ge-custom',
     logger,
   });
+  if (!latestRelease) {
+    throw new SteamyError(
+      'Failed to fetch releases from GitHub.',
+      'EXTERNAL_DEPENDENCY_ERROR',
+      'Re-run with --verbose for more details, or try again later if rate-limited.',
+    );
+  }
 
   if (protonVersions.has(latestRelease.tag_name)) {
     logger.info(
