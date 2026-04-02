@@ -8,7 +8,7 @@ async function git(cmd: string[]) {
   return undefined;
 }
 
-const tag = await git(["describe", "--tags", "--dirty", "--always"]) ?? Deno.env.get("STEAMY_VERSION") ?? "0.0.0-dev";
+const tag = Deno.env.get("STEAMY_VERSION") ?? await git(["describe", "--tags", "--dirty", "--always"]) ?? "0.0.0-dev";
 const commit = await git(["rev-parse", "--short", "HEAD"]) ?? "unknown";
 const builtAt = new Date().toISOString();
 
