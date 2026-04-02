@@ -11,6 +11,7 @@ import { getInstalledProtonVersions } from '../../../core/steam/proton.ts';
 import { SteamyError } from '../../../core/errors.ts';
 import { startSpinner } from '../../../core/spinner.ts';
 import { getLatestRelease } from '../../../core/update/github-releases.ts';
+import { selectProtonTarball } from '../../../core/update/asset-selection.ts';
 
 const linuxHandler = async (logger: Logger) => {
   const rootDir = protonPrefixDir();
@@ -41,8 +42,9 @@ const linuxHandler = async (logger: Logger) => {
     // https://medium.com/deno-the-complete-reference/file-download-through-fetch-api-in-deno-771f30b19471
 
     // Download the release tarball
-    const asset = latestRelease.assets.find((e) =>
-      e.name === `${latestRelease.tag_name}.tar.gz`
+    const asset = selectProtonTarball(
+      latestRelease.assets,
+      latestRelease.tag_name,
     );
     const downloadUrl = asset?.browser_download_url;
     if (!asset || !downloadUrl) {
@@ -59,7 +61,7 @@ const linuxHandler = async (logger: Logger) => {
       } from ${downloadUrl}`,
     );
 
-    const tarballPath = `${protonPrefixDir()}/${latestRelease.tag_name}.tar.gz`;
+    const tarballPath = `${protonPrefixDir()}/${asset.name}`;
     const downloadSpinner = startSpinner({ text: 'Downloading' });
     try {
       const response = await fetch(downloadUrl);
