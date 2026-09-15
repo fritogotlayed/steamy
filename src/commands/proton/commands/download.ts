@@ -45,12 +45,14 @@ const linuxHandler = async (logger: Logger) => {
     const asset = selectProtonTarball(
       latestRelease.assets,
       latestRelease.tag_name,
+      Deno.build.arch,
     );
     const downloadUrl = asset?.browser_download_url;
     if (!asset || !downloadUrl) {
       throw new SteamyError(
-        `No Proton tarball found for ${latestRelease.tag_name}!`,
+        `No Proton tarball found for ${latestRelease.tag_name} matching ${Deno.build.arch}!`,
         'EXTERNAL_DEPENDENCY_ERROR',
+        `The release may not ship a ${Deno.build.arch} build. Check ${latestRelease.html_url} for the available assets.`,
       );
     }
 
